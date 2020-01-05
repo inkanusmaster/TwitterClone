@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -15,6 +14,10 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
+import java.util.ArrayList;
+
+import static com.parse.ParseUser.logOut;
+
 public class MainActivity extends AppCompatActivity {
 
     EditText usernameEditText;
@@ -22,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void redirectToUsers() { // przejście do listy userów (nowa aktywność)
         if (ParseUser.getCurrentUser() != null) { // jeśli ktoś jest zalogowany...
-            Intent intent = new Intent(getApplicationContext(),UsersActivity.class); // ...przejdź do listy userów
+            Intent intent = new Intent(getApplicationContext(), UsersActivity.class); // ...przejdź do listy userów
             startActivity(intent); // no odpal intent
         }
     }
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
                     ParseUser newUser = new ParseUser();
                     newUser.setUsername(usernameEditText.getText().toString());
                     newUser.setPassword(passwordEditText.getText().toString());
+                    newUser.put("isFollowing", new ArrayList<String>()); // dodajemy [] do kolumny isFollowing bo nam wywali błąd przy logowaniu.
                     newUser.signUpInBackground(new SignUpCallback() {
                         @Override
                         public void done(ParseException e) {
@@ -61,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ParseUser.getCurrentUser();
+        logOut();
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
     }
 }
