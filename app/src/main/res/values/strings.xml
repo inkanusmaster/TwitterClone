@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Twitter Clone</string>
+    <string name="tweet">Tweet</string>
+    <string name="logout">Logout</string>
 </resources>

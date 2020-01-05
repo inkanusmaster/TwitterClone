@@ -1,19 +1,31 @@
 package com.example.twitterclone;
 
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +37,60 @@ public class UsersActivity extends AppCompatActivity {
     ArrayList<String> users = new ArrayList<>();
     ArrayAdapter<String> arrayAdapter;
     ListView usersListView;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) { // robimy menu w górnym prawym rogu
+        MenuInflater menuInflater = new MenuInflater(this);
+        menuInflater.inflate(R.menu.tweeet_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) { // co będzie jak ktos wybierze dana opcję z menu
+        if (item.getItemId() == R.id.tweet) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this); // robimy tweeta alert dialogiem
+            builder.setTitle("Send a tweet"); // nagłówek
+            final EditText tweetEditText = new EditText(this); // pole edittext na tweet
+            builder.setView(tweetEditText);
+            builder.setPositiveButton("Send", new DialogInterface.OnClickListener() { // co będzie jak klikniemy Send
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (tweetEditText.getText().toString().isEmpty()) { // nie chcę pustych tweetów
+                        Toast.makeText(UsersActivity.this, "Tweet cannot be empty!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        ParseObject tweet = new ParseObject("Tweet"); // zapisujemy tweety do klasy Tweet
+                        tweet.put("tweet", tweetEditText.getText().toString()); // do kolumny tweet wpisujemy zawartość tweeta
+                        tweet.put("username", ParseUser.getCurrentUser().getUsername()); // do kolumny username wpisujemy aktualnego usera
+                        tweet.saveInBackground(new SaveCallback() { // zapisujemy z callbackiem oczywiście
+                            @SuppressLint("Assert")
+                            @Override
+                            public void done(ParseException e) {
+                                if (e == null) {
+                                    assert false;
+                                    Toast.makeText(UsersActivity.this, "Tweet sent!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(UsersActivity.this, e.getMessage().substring(e.getMessage().indexOf(" ")), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() { // co będzie jak klikniemy Cancel
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel(); // wyłączamy dialog interface
+                }
+            });
+            builder.show(); // pokazujemy alertdialog builder
+
+        } else if (item.getItemId() == R.id.logout) {
+            ParseUser.logOut(); // wylogowujemy się...
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class); // ...i wracamy do menu logowania
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
