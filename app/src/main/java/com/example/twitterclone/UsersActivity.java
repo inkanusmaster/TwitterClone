@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -87,6 +86,9 @@ public class UsersActivity extends AppCompatActivity {
         } else if (item.getItemId() == R.id.logout) {
             ParseUser.logOut(); // wylogowujemy się...
             Intent intent = new Intent(getApplicationContext(), MainActivity.class); // ...i wracamy do menu logowania
+            startActivity(intent);
+        } else if (item.getItemId() == R.id.viewFeed) { // wyświetlamy feed
+            Intent intent = new Intent(getApplicationContext(), FeedActivity.class);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);

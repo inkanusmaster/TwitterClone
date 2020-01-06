@@ -4,6 +4,9 @@
         android:id="@+id/tweet"
         android:title="@string/tweet" />
     <item
+        android:id="@+id/viewFeed"
+        android:title="@string/your_feed" />
+    <item
         android:id="@+id/logout"
         android:title="@string/logout" />
 </menu>
